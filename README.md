@@ -22,15 +22,19 @@ servathub
 
 Au premier lancement, connecte-toi avec un compte gratuit sur freebuff.com (la page de connexion s'ouvre toute seule).
 
-## Manuel
+## Désinstallation (Windows)
 
-L'installeur copie les fichiers dans `%USERPROFILE%\servathub` et ajoute ce dossier au PATH de l'utilisateur. Pour désinstaller :
+Ouvre un **invite de commandes (cmd)** et colle :
 
 ```cmd
-rmdir /s /q "%USERPROFILE%\servathub"
+powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/uninstall.ps1 | iex"
 ```
 
-puis retire la ligne `C:\Users\...\servathub` de tes variables d'environnement (Paramètres → Système → Paramètres système avancés → Variables d'environnement → Path).
+Le script ferme servathub s'il tourne, supprime le dossier `%USERPROFILE%\servathub` et retire l'entrée du PATH. Ouvre ensuite un nouveau cmd pour que le PATH soit à jour.
+
+## Manuel
+
+L'installeur copie les fichiers dans `%USERPROFILE%\servathub` et ajoute ce dossier au PATH de l'utilisateur.
 
 ## Remarque
 
