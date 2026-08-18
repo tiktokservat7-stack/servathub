@@ -1,0 +1,4 @@
+# .bat files must keep CRLF line endings: cmd.exe relies on them for
+# labels/goto and multi-line blocks. -text stores the file exactly as-is
+# (no Git line-ending normalization) so the raw download stays CRLF.
+*.bat -text
