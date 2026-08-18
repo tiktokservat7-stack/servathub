@@ -1,11 +1,11 @@
 # servathub — installer
 # Télécharge servathub depuis GitHub et l'installe pour l'utilisateur courant.
 # Usage (dans cmd) :
-#   powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/OWNER/servathub/main/install.ps1 | iex"
+#   powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.ps1 | iex"
 $ErrorActionPreference = 'Stop'
 
 # Remplacez par le propriétaire du dépôt GitHub (ex: 'dupont').
-$owner = 'OWNER'
+$owner = 'tiktokservat7-stack'
 $repo = 'servathub'
 $dest = Join-Path $env:USERPROFILE 'servathub'
 $baseUrl = "https://github.com/$owner/$repo/releases/latest/download"

