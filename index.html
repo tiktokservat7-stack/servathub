@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>servathub — Assistant IA gratuit · DeepSeek V4 Flash Unlimited</title>
+<meta name="description" content="servathub : ton assistant de codage IA gratuit et illimité dans le terminal Windows. DeepSeek V4 Flash, zéro pub. Installe en une commande.">
+<style>
+  :root {
+    --bg: #05060a;
+    --bg-soft: #0b0d14;
+    --card: #10131c;
+    --card-hover: #161a27;
+    --border: #1e2434;
+    --text: #f4f6fb;
+    --text-dim: #9aa3b5;
+    --text-faint: #6b7280;
+    --blue: #3b82f6;
+    --blue-bright: #60a5fa;
+    --blue-deep: #1d4ed8;
+    --blue-glow: rgba(59, 130, 246, 0.25);
+    --discord: #5865f2;
+    --discord-glow: rgba(88, 101, 242, 0.35);
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --radius: 14px;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "Cascadia Code", "Consolas", "Courier New", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  ::selection { background: var(--blue); color: #fff; }
+  a { color: var(--blue-bright); text-decoration: none; }
+  a:hover { text-decoration: none; }
+  img, svg { display: block; }
+
+  /* ---------- Fond décoratif ---------- */
+  .bg-glow {
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(1000px 550px at 82% -12%, var(--blue-glow), transparent 60%),
+      radial-gradient(760px 420px at 8% 112%, rgba(88,101,242,0.14), transparent 60%),
+      linear-gradient(180deg, var(--bg) 0%, #070910 100%);
+  }
+  .grid-overlay {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .4;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, #000 40%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 95% 75% at 50% 0%, #000 40%, transparent 78%);
+  }
+
+  /* ---------- Navbar ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px);
+    background: rgba(5,6,10,.72);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    max-width: 1120px; margin: 0 auto; padding: 13px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 18px; letter-spacing: .3px;
+  }
+  .brand .dot {
+    width: 13px; height: 13px; border-radius: 4px;
+    background: linear-gradient(135deg, var(--blue-bright), var(--blue-deep));
+    box-shadow: 0 0 14px var(--blue-glow);
+  }
+  .nav-right { display: flex; align-items: center; gap: 20px; }
+  .nav-links { display: flex; gap: 20px; font-size: 14px; color: var(--text-dim); }
+  .nav-links a { color: var(--text-dim); transition: color .15s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-discord {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--discord); color: #fff; font-size: 13px; font-weight: 600;
+    padding: 8px 14px; border-radius: 10px; transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 18px var(--discord-glow);
+  }
+  .nav-discord:hover { transform: translateY(-1px); box-shadow: 0 8px 26px var(--discord-glow); }
+  .nav-discord svg { width: 16px; height: 16px; }
+  @media (max-width: 780px) { .nav-links { display: none; } }
+
+  /* ---------- Layout ---------- */
+  main { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 60px 0; }
+  .section-tag {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    letter-spacing: 1.6px; text-transform: uppercase; color: var(--blue-bright);
+    margin-bottom: 12px;
+  }
+  h2 { font-size: 30px; font-weight: 750; letter-spacing: -.5px; margin-bottom: 10px; }
+  .section-sub { color: var(--text-dim); max-width: 680px; margin-bottom: 34px; }
+
+  /* ---------- Scroll reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .16s; } .reveal.d3 { transition-delay: .24s; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 88px 0 64px; text-align: center; }
+  .hero .logo-ascii {
+    display: inline-block; font-family: var(--mono); font-size: 13px;
+    line-height: 1.25; text-align: left; color: var(--text);
+    text-shadow: 0 0 26px var(--blue-glow);
+    margin-bottom: 26px; white-space: pre;
+    animation: floaty 5s ease-in-out infinite;
+  }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .hero h1 {
+    font-size: clamp(42px, 7.4vw, 68px); font-weight: 850; letter-spacing: -1.6px; line-height: 1.05;
+    background: linear-gradient(180deg, #fff 28%, #9db4ff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin-bottom: 16px;
+  }
+  .hero p.lead { font-size: 18px; color: var(--text-dim); max-width: 640px; margin: 0 auto 30px; }
+  .hero p.lead b { color: var(--text); }
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 40px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 999px; font-size: 13.5px; color: var(--text-dim);
+  }
+  .badge b { color: var(--text); font-weight: 600; }
+  .badge .ico { color: var(--blue-bright); }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 14px 26px; border-radius: 12px; font-weight: 650; font-size: 15px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--blue-bright), var(--blue-deep));
+    color: #fff; box-shadow: 0 8px 32px var(--blue-glow);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 44px var(--blue-glow); }
+  .btn-discord {
+    background: var(--discord); color: #fff; box-shadow: 0 8px 30px var(--discord-glow);
+  }
+  .btn-discord:hover { transform: translateY(-2px); box-shadow: 0 12px 42px var(--discord-glow); }
+  .btn-discord svg { width: 18px; height: 18px; }
+  .btn-ghost { border: 1px solid var(--border); color: var(--text); background: var(--card); }
+  .btn-ghost:hover { transform: translateY(-2px); border-color: var(--blue); }
+
+  /* ---------- Stats ---------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    max-width: 820px; margin: 54px auto 0;
+  }
+  .stat {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 22px 14px; text-align: center;
+  }
+  .stat .n {
+    font-size: 28px; font-weight: 800; letter-spacing: -.5px;
+    background: linear-gradient(180deg, #fff, var(--blue-bright));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .l { font-size: 12.5px; color: var(--text-faint); margin-top: 4px; }
+  @media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---------- Terminal ---------- */
+  .terminal {
+    margin: 46px auto 0; max-width: 660px; text-align: left;
+    background: #07080d; border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,.55);
+  }
+  .terminal .bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; background: var(--card); border-bottom: 1px solid var(--border);
+  }
+  .terminal .bar .circle { width: 11px; height: 11px; border-radius: 50%; }
+  .terminal .bar .c1 { background: #ff5f57; } .terminal .bar .c2 { background: #febc2e; } .terminal .bar .c3 { background: #28c840; }
+  .terminal .bar .title { margin-left: 8px; font-size: 12.5px; color: var(--text-faint); font-family: var(--mono); }
+  .terminal pre {
+    padding: 18px 20px; font-family: var(--mono); font-size: 13px; color: #d7dce8;
+    overflow-x: auto; line-height: 1.75;
+  }
+  .terminal .prompt { color: var(--blue-bright); }
+  .terminal .cmd { color: #fff; }
+  .terminal .out { color: var(--text-faint); }
+  .terminal .hl { color: var(--blue-bright); }
+  .terminal .ok { color: var(--ok); }
+
+  /* ---------- Feature cards ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px; transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(59,130,246,.5); background: var(--card-hover); }
+  .card .ico { font-size: 26px; margin-bottom: 12px; display: block; }
+  .card h3 { font-size: 16px; font-weight: 650; margin-bottom: 8px; }
+  .card p { font-size: 14px; color: var(--text-dim); }
+  .card p code { font-family: var(--mono); font-size: 13px; color: var(--blue-bright); }
+
+  /* ---------- Comparatif ---------- */
+  .compare { max-width: 760px; margin: 0 auto; }
+  .compare table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .compare th, .compare td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .compare thead th {
+    color: var(--text-faint); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+  }
+  .compare td:first-child { color: var(--text-dim); }
+  .compare td:last-child, .compare th:last-child { text-align: center; }
+  .yes { color: var(--ok); font-weight: 700; }
+  .no { color: var(--text-faint); }
+  .compare .me { border: 1px solid rgba(59,130,246,.45); background: rgba(59,130,246,.06); }
+  .compare .me td:last-child { color: var(--blue-bright); font-weight: 700; }
+
+  /* ---------- Steps ---------- */
+  .steps { display: flex; flex-direction: column; max-width: 780px; }
+  .step { display: flex; gap: 20px; position: relative; padding-bottom: 36px; }
+  .step::before {
+    content: ""; position: absolute; left: 21px; top: 46px; bottom: 0;
+    width: 2px; background: linear-gradient(180deg, var(--blue), transparent);
+  }
+  .step:last-child::before { display: none; }
+  .step .num {
+    flex: 0 0 44px; width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--blue-bright), var(--blue-deep));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 17px; color: #fff; box-shadow: 0 6px 20px var(--blue-glow);
+  }
+  .step .body { flex: 1; padding-top: 4px; }
+  .step h3 { font-size: 17px; font-weight: 650; margin-bottom: 6px; }
+  .step p { font-size: 14.5px; color: var(--text-dim); margin-bottom: 12px; }
+  .step p b { color: var(--text); }
+
+  /* ---------- Code blocks ---------- */
+  .code-wrap { position: relative; margin: 8px 0; }
+  .code-wrap pre {
+    background: #07080d; border: 1px solid var(--border); border-radius: 12px;
+    padding: 15px 50px 15px 17px; overflow-x: auto; font-family: var(--mono);
+    font-size: 13px; color: #dbe4f5; line-height: 1.65; white-space: pre-wrap; word-break: break-all;
+    transition: border-color .15s;
+  }
+  .code-wrap pre:hover { border-color: rgba(59,130,246,.45); }
+  .code-wrap .copy {
+    position: absolute; top: 9px; right: 9px;
+    background: var(--card); border: 1px solid var(--border); color: var(--text-dim);
+    font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 8px; cursor: pointer;
+    transition: all .15s ease;
+  }
+  .code-wrap .copy:hover { color: var(--text); border-color: var(--blue); }
+  .code-wrap .copy.copied { color: var(--ok); border-color: var(--ok); }
+  .code-label {
+    font-size: 11.5px; color: var(--text-faint); font-family: var(--mono);
+    margin: 18px 0 2px; letter-spacing: .6px; text-transform: uppercase;
+  }
+
+  /* ---------- Two methods ---------- */
+  .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .methods { grid-template-columns: 1fr; } }
+  .method {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 24px;
+  }
+  .method .tag {
+    display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: 1px;
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .tag.rec { background: rgba(59,130,246,.15); color: var(--blue-bright); border: 1px solid rgba(59,130,246,.4); }
+  .tag.alt { background: rgba(255,255,255,.06); color: var(--text-dim); border: 1px solid var(--border); }
+  .method h3 { font-size: 16px; margin-bottom: 6px; }
+  .method p { font-size: 13.5px; color: var(--text-dim); margin-bottom: 12px; }
+
+  /* ---------- Discord section ---------- */
+  .discord-card {
+    display: flex; align-items: center; gap: 26px; flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(88,101,242,.16), rgba(59,130,246,.08));
+    border: 1px solid rgba(88,101,242,.45); border-radius: 18px;
+    padding: 34px 36px;
+  }
+  .discord-card .grow { flex: 1; min-width: 260px; }
+  .discord-card h3 { font-size: 22px; font-weight: 750; margin-bottom: 8px; }
+  .discord-card p { color: var(--text-dim); margin-bottom: 18px; }
+  .discord-logo {
+    width: 84px; height: 84px; border-radius: 22px; flex-shrink: 0;
+    background: var(--discord); display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 16px 44px var(--discord-glow);
+  }
+  .discord-logo svg { width: 46px; height: 46px; }
+
+  /* ---------- Notes / FAQ ---------- */
+  .note {
+    background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--blue);
+    border-radius: 10px; padding: 15px 18px; margin: 14px 0;
+    font-size: 14px; color: var(--text-dim);
+  }
+  .note b { color: var(--text); }
+  .note.warn { border-left-color: var(--warn); }
+  .note.ok { border-left-color: var(--ok); }
+  .faq { max-width: 760px; }
+  .faq-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    margin-bottom: 10px; overflow: hidden;
+  }
+  .faq-item button {
+    width: 100%; text-align: left; background: none; border: none; color: var(--text);
+    font-family: var(--font); font-size: 15px; font-weight: 600;
+    padding: 17px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  }
+  .faq-item button .chev { transition: transform .25s ease; color: var(--blue-bright); font-size: 13px; }
+  .faq-item.open button .chev { transform: rotate(180deg); }
+  .faq-item .answer { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+  .faq-item .answer p { padding: 0 20px 18px; font-size: 14px; color: var(--text-dim); }
+  .faq-item .answer code { font-family: var(--mono); color: var(--blue-bright); font-size: 13px; }
+
+  /* ---------- Back to top ---------- */
+  #toTop {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60;
+    width: 46px; height: 46px; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--card); color: var(--blue-bright); font-size: 20px; cursor: pointer;
+    opacity: 0; pointer-events: none; transform: translateY(10px);
+    transition: all .25s ease;
+  }
+  #toTop.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  #toTop:hover { border-color: var(--blue); }
+
+  footer {
+    border-top: 1px solid var(--border); padding: 44px 0; text-align: center;
+    color: var(--text-faint); font-size: 13px;
+  }
+  footer .links { display: flex; gap: 22px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+  footer .links a { color: var(--text-dim); font-weight: 600; }
+  footer .links a:hover { color: var(--text); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 60px 0 44px; }
+    section { padding: 42px 0; }
+    .hero .logo-ascii { font-size: 8.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="grid-overlay"></div>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span>servathub</div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#install">Installer</a>
+        <a href="#comparatif">Comparatif</a>
+        <a href="#commandes">Commandes</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <a class="nav-discord" href="https://discord.gg/uQ5eyyXUAh" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        Discord
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <pre class="logo-ascii">███████╗███████╗██████╗ ██╗   ██╗ █████╗ ████████╗    ██╗  ██╗██╗   ██╗██████╗
+██╔════╝██╔════╝██╔══██╗██║   ██║██╔══██╗╚══██╔══╝    ██║  ██║██║   ██║██╔══██╗
+███████╗█████╗  ██████╔╝██║   ██║███████║   ██║       ███████║██║   ██║██████╔╝
+╚════██║██╔══╝  ██╔══██╗██║   ██║██╔══██║   ██║       ██╔══██║██║   ██║██╔══██╗
+███████║███████╗██║  ██║╚██████╔╝██║  ██║   ██║       ██║  ██║╚██████╔╝██████╔╝
+╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝ ╚═════╝ ╚═════╝</pre>
+  <h1>Ton assistant IA,<br>gratuit et illimité.</h1>
+  <p class="lead">
+    servathub est un assistant de codage IA basé sur le chat, avec le modèle
+    <b>DeepSeek V4 Flash — Unlimited</b>. Sans pub, direct depuis ton terminal Windows.
+  </p>
+  <div class="badges">
+    <span class="badge"><span class="ico">⚡</span><b>DeepSeek V4 Flash</b> · Unlimited</span>
+    <span class="badge"><span class="ico">🚫</span>Zéro publicité</span>
+    <span class="badge"><span class="ico">🔓</span>Gratuit</span>
+    <span class="badge"><span class="ico">🪟</span>Windows</span>
+  </div>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#install">🚀 Installer maintenant</a>
+    <a class="btn btn-discord" href="https://discord.gg/uQ5eyyXUAh" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+      Rejoindre le Discord
+    </a>
+  </div>
+
+  <div class="stats reveal">
+    <div class="stat"><div class="n">1</div><div class="l">commande à coller</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">publicité</div></div>
+    <div class="stat"><div class="n">∞</div><div class="l">usage illimité</div></div>
+    <div class="stat"><div class="n">2 min</div><div class="l">pour installer</div></div>
+  </div>
+
+  <div class="terminal reveal d2">
+    <div class="bar">
+      <span class="circle c1"></span><span class="circle c2"></span><span class="circle c3"></span>
+      <span class="title">cmd — servathub</span>
+    </div>
+    <pre><span class="prompt">C:\Users\vous&gt;</span> <span class="cmd">servathub</span>
+<span class="out">███████╗███████╗██████╗ ██╗   ██╗ █████╗ ████████╗    ██╗  ██╗██╗   ██╗██████╗</span>
+<span class="out">██╔════╝██╔════╝██╔══██╗██║   ██║██╔══██╗╚══██╔══╝    ██║  ██║██║   ██║██╔══██╗</span>
+<span class="hl">┌─ RECOMMENDED ───────────────────────┐</span>
+<span class="hl">│› DeepSeek V4 Flash · Unlimited · NEW │</span>
+<span class="hl">└──────────────────────────────────────┘</span>
+<span class="ok">✓ Connecté — prêt à coder. Aucune pub.</span>
+<span class="out">▍</span></pre>
+  </div>
+</header>
+
+<!-- ================= POURQUOI ================= -->
+<section id="pourquoi">
+  <div class="reveal">
+    <span class="section-tag">Pourquoi servathub ?</span>
+    <h2>Simple, rapide, sans pub</h2>
+    <p class="section-sub">Une seule carte de modèle, aucun écran publicitaire, et l'installation se fait en une seule commande.</p>
+  </div>
+  <div class="grid">
+    <div class="card reveal"><span class="ico">🤖</span><h3>Un seul modèle</h3><p>DeepSeek V4 Flash en mode <b style="color:var(--text)">Unlimited</b> — pas de menu compliqué, tu lances et tu codes.</p></div>
+    <div class="card reveal d1"><span class="ico">🚫</span><h3>Aucune pub</h3><p>Pas de bannières, pas de pubs dans les réponses, pas de « sponsorisé ». Le chat, rien que le chat.</p></div>
+    <div class="card reveal d2"><span class="ico">⚡</span><h3>Une commande</h3><p>Copie, colle, ouvre un nouveau cmd, tape <code>servathub</code>. C'est tout.</p></div>
+    <div class="card reveal d3"><span class="ico">🛡️</span><h3>Ton compte, ton choix</h3><p>Chacun se connecte avec son propre compte gratuit. Simple et sûr.</p></div>
+  </div>
+</section>
+
+<!-- ================= COMPARATIF ================= -->
+<section id="comparatif">
+  <div class="reveal">
+    <span class="section-tag">La différence</span>
+    <h2>servathub vs Freebuff classique</h2>
+    <p class="section-sub">Ce que tu gagnes en utilisant servathub.</p>
+  </div>
+  <div class="compare reveal d1">
+    <table>
+      <thead>
+        <tr><th></th><th>Freebuff classique</th><th>servathub</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Publicités</td><td class="no">Oui (bannières + dans les réponses)</td><td class="yes">Aucune</td></tr>
+        <tr><td>Sélecteur de modèles</td><td class="no">Plusieurs modèles confusants</td><td class="yes">Un seul : DeepSeek V4 Flash</td></tr>
+        <tr><td>Installation</td><td class="no">Longue</td><td class="yes">1 commande</td></tr>
+        <tr class="me"><td>Connexion au lancement</td><td class="no">Obligatoire à chaque fois</td><td class="yes">Une seule fois</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= INSTALL ================= -->
+<section id="install">
+  <div class="reveal">
+    <span class="section-tag">Tutoriel</span>
+    <h2>Installer en 3 étapes</h2>
+    <p class="section-sub">De zéro à l'assistant lancé, en moins de deux minutes.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step reveal">
+      <div class="num">1</div>
+      <div class="body">
+        <h3>Ouvre un invite de commandes (cmd)</h3>
+        <p>Appuie sur <b>⊞ Win</b>, tape <code style="font-family:var(--mono)">cmd</code>, puis <b>Entrée</b>.</p>
+      </div>
+    </div>
+    <div class="step reveal d1">
+      <div class="num">2</div>
+      <div class="body">
+        <h3>Colle la commande d'installation</h3>
+        <p>Copie la ligne ci-dessous (bouton à droite), colle-la dans le cmd et appuie sur <b>Entrée</b> :</p>
+        <div class="code-wrap">
+          <button class="copy" onclick="copyCmd(this)">Copier</button>
+          <pre>curl -fsSL https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.bat -o "%TEMP%\sv-install.bat" && "%TEMP%\sv-install.bat"</pre>
+        </div>
+        <p>Le script télécharge servathub (≈121 Mo), l'installe dans <code style="font-family:var(--mono)">C:\Users\vous\servathub</code> et configure le PATH tout seul. Tu verras <b style="color:var(--ok)">« Termine ! »</b> à la fin.</p>
+      </div>
+    </div>
+    <div class="step reveal d2">
+      <div class="num">3</div>
+      <div class="body">
+        <h3>Ouvre un nouveau cmd et lance</h3>
+        <p><b>Ferme le cmd</b>, rouvres-en un nouveau (pour que le PATH soit pris en compte), puis tape :</p>
+        <div class="code-wrap">
+          <button class="copy" onclick="copyCmd(this)">Copier</button>
+          <pre>servathub</pre>
+        </div>
+        <p>Au premier lancement, connecte-toi avec ton compte gratuit — la page de connexion s'ouvre automatiquement.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="note ok reveal"><b>✅ Astuce :</b> pour vérifier que tout est bien installé : <code style="font-family:var(--mono)">servathub --version</code> → doit afficher <code style="font-family:var(--mono)">1.0.0</code>.</div>
+</section>
+
+<!-- ================= COMMANDES ================= -->
+<section id="commandes">
+  <div class="reveal">
+    <span class="section-tag">Référence</span>
+    <h2>Toutes les commandes</h2>
+    <p class="section-sub">La liste complète, prête à copier-coller.</p>
+  </div>
+
+  <div class="code-label reveal">📥 Installer — méthode curl (recommandée)</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>curl -fsSL https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.bat -o "%TEMP%\sv-install.bat" && "%TEMP%\sv-install.bat"</pre></div>
+
+  <div class="code-label reveal">📥 Installer — méthode PowerShell (alternative)</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.ps1 | iex"</pre></div>
+
+  <div class="code-label reveal">🚀 Lancer</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>servathub</pre></div>
+
+  <div class="code-label reveal">ℹ️ Vérifier la version</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>servathub --version</pre></div>
+
+  <div class="code-label reveal">📦 Désinstaller — méthode curl</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>curl -fsSL https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/uninstall.bat -o "%TEMP%\sv-uninstall.bat" && "%TEMP%\sv-uninstall.bat"</pre></div>
+
+  <div class="code-label reveal">📦 Désinstaller — méthode PowerShell</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/uninstall.ps1 | iex"</pre></div>
+</section>
+
+<!-- ================= UPDATE ================= -->
+<section id="update">
+  <div class="reveal">
+    <span class="section-tag">Mise à jour</span>
+    <h2>Mettre à jour servathub</h2>
+    <p class="section-sub">Rien de plus simple : re-exécute la commande d'installation. L'installeur ferme automatiquement l'ancienne version et remplace les fichiers.</p>
+  </div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>curl -fsSL https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/install.bat -o "%TEMP%\sv-install.bat" && "%TEMP%\sv-install.bat"</pre></div>
+  <div class="note reveal"><b>💡</b> Tes réglages et ta connexion sont conservés pendant la mise à jour.</div>
+</section>
+
+<!-- ================= UNINSTALL ================= -->
+<section id="uninstall">
+  <div class="reveal">
+    <span class="section-tag">Désinstallation</span>
+    <h2>Désinstaller proprement</h2>
+    <p class="section-sub">Le script ferme servathub, supprime le dossier et retire le PATH. Ensuite, ouvre un nouveau cmd.</p>
+  </div>
+  <div class="methods">
+    <div class="method reveal">
+      <span class="tag rec">CURL</span>
+      <h3>Désinstaller</h3>
+      <p>La même méthode que l'installation :</p>
+      <div class="code-wrap"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>curl -fsSL https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/uninstall.bat -o "%TEMP%\sv-uninstall.bat" && "%TEMP%\sv-uninstall.bat"</pre></div>
+    </div>
+    <div class="method reveal d1">
+      <span class="tag alt">POWERSHELL</span>
+      <h3>Désinstaller</h3>
+      <p>L'alternative en une ligne :</p>
+      <div class="code-wrap"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/uninstall.ps1 | iex"</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DISCORD ================= -->
+<section id="discord">
+  <div class="discord-card reveal">
+    <div class="discord-logo">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+    </div>
+    <div class="grow">
+      <h3>Rejoins la communauté Discord</h3>
+      <p>De l'aide à l'installation, des astuces, des annonces et des retours en direct avec les autres utilisateurs de servathub.</p>
+      <a class="btn btn-discord" href="https://discord.gg/uQ5eyyXUAh" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+        discord.gg/uQ5eyyXUAh
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="reveal">
+    <span class="section-tag">FAQ</span>
+    <h2>Questions fréquentes</h2>
+  </div>
+  <div class="faq">
+    <div class="faq-item reveal">
+      <button onclick="toggleFaq(this)">Qu'est-ce que tree-sitter.wasm ?<span class="chev">▼</span></button>
+      <div class="answer"><p>Un fichier indispensable qui doit toujours rester à côté de <code>servathub.exe</code> (dans <code>C:\Users\vous\servathub</code>). L'installeur s'en occupe automatiquement — ne le supprime pas.</p></div>
+    </div>
+    <div class="faq-item reveal d1">
+      <button onclick="toggleFaq(this)">« Il me demande de me connecter »<span class="chev">▼</span></button>
+      <div class="answer"><p>C'est normal pour la version publique : chacun utilise son propre compte gratuit. La connexion ne se fait qu'une fois au premier lancement.</p></div>
+    </div>
+    <div class="faq-item reveal d2">
+      <button onclick="toggleFaq(this)">Windows me demande « Autoriser l'accès » (pare-feu) ?<span class="chev">▼</span></button>
+      <div class="answer"><p>C'est Windows, pas servathub : clique sur <b>Autoriser l'accès</b> une seule fois, ça ne reviendra plus.</p></div>
+    </div>
+    <div class="faq-item reveal d3">
+      <button onclick="toggleFaq(this)">La commande « servathub » n'est pas reconnue ?<span class="chev">▼</span></button>
+      <div class="answer"><p>Ouvre un <b>nouveau</b> cmd — le PATH ne se rafraîchit pas dans un cmd déjà ouvert. Vérifie aussi avec <code>servathub --version</code>.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button onclick="toggleFaq(this)">C'est vraiment gratuit ?<span class="chev">▼</span></button>
+      <div class="answer"><p>Oui. servathub utilise le modèle DeepSeek V4 Flash en mode Unlimited et ne contient aucune publicité.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="links">
+    <a href="#install">Installer</a>
+    <a href="#commandes">Commandes</a>
+    <a href="https://github.com/tiktokservat7-stack/servathub" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://discord.gg/uQ5eyyXUAh" target="_blank" rel="noopener">Discord</a>
+  </div>
+  <p>servathub · DeepSeek V4 Flash Unlimited · Sans pub · Fait avec 💙</p>
+</footer>
+
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Haut de page">↑</button>
+
+<script>
+  // --- Scroll reveal ---
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // --- Copy ---
+  function copyCmd(btn) {
+    const text = btn.nextElementSibling.innerText;
+    const done = () => {
+      const old = btn.textContent;
+      btn.textContent = '✓ Copié !';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = old; btn.classList.remove('copied'); }, 1600);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta); done();
+  }
+
+  // --- FAQ accordion ---
+  function toggleFaq(btn) {
+    const item = btn.parentElement;
+    const answer = item.querySelector('.answer');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach((o) => {
+      o.classList.remove('open'); o.querySelector('.answer').style.maxHeight = '0';
+    });
+    if (!isOpen) { item.classList.add('open'); answer.style.maxHeight = answer.scrollHeight + 'px'; }
+  }
+
+  // --- Back to top ---
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('show', window.scrollY > 600);
+  }, { passive: true });
+</script>
+</body>
+</html>
