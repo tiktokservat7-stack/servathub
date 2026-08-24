@@ -1,0 +1,10 @@
+name = "servathebergeur"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+assets = { directory = "./public", binding = "ASSETS", not_found_handling = "none" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "servathebergeur-db"
+database_id = "f89398c5-0723-457d-845e-fe6026b97b50"

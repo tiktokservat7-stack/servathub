@@ -1,0 +1,13 @@
+{
+  "name": "servathebergeur",
+  "version": "1.0.0",
+  "private": true,
+  "description": "servathub — hébergeur de sites statiques sur Cloudflare Workers (D1 + assets)",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  }
+}

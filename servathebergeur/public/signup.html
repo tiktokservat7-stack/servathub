@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer un compte — servathub</title>
+<link rel="stylesheet" href="/app/app.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <a class="auth-back" href="/">← Retour à l'accueil</a>
+    <a class="brand" href="/"><span class="dot"></span>servathub</a>
+    <h1>Crée ton compte</h1>
+    <p class="auth-sub">Gratuit, sans carte bancaire. Ton site en ligne dans la minute.</p>
+    <div class="form-error" id="error"></div>
+    <form id="signup-form">
+      <div class="form-group">
+        <label for="email">Adresse e-mail</label>
+        <input class="input" type="email" id="email" autocomplete="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Mot de passe <span class="faint">(6 caractères min.)</span></label>
+        <input class="input" type="password" id="password" autocomplete="new-password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="password2">Confirme le mot de passe</label>
+        <input class="input" type="password" id="password2" autocomplete="new-password" required minlength="6">
+      </div>
+      <button class="btn btn-primary" type="submit" id="submit">Créer mon compte</button>
+    </form>
+    <p class="auth-switch">Déjà un compte ? <a href="/login">Se connecter</a></p>
+  </div>
+</div>
+<script src="/app/app.js"></script>
+<script>
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('error');
+    clearError(err);
+    const p1 = document.getElementById('password').value;
+    const p2 = document.getElementById('password2').value;
+    if (p1 !== p2) return showError(err, 'Les mots de passe ne correspondent pas.');
+    const btn = document.getElementById('submit');
+    btn.disabled = true; btn.textContent = 'Création du compte…';
+    try {
+      await api('/api/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify({ email: document.getElementById('email').value, password: p1 }),
+      });
+      location.href = '/dashboard';
+    } catch (ex) {
+      showError(err, ex.message);
+      btn.disabled = false; btn.textContent = 'Créer mon compte';
+    }
+  });
+</script>
+</body>
+</html>

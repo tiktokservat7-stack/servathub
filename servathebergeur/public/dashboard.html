@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord — servathub</title>
+<link rel="stylesheet" href="/app/app.css">
+<style>.choice[data-type="bot"]{display:none!important}</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/"><span class="dot"></span>servathub</a>
+    <div class="topbar-right">
+      <span class="user">Connecté : <b id="user-email">…</b></span>
+      <a class="btn btn-ghost btn-sm" href="/" target="_blank">Site public</a>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Déconnexion</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="dash-head">
+    <div>
+      <h1 class="page-title">Mes déploiements</h1>
+      <p class="page-sub" style="margin-bottom:0">Sites web et bots Discord — hébergés, démarrés, surveillés.</p>
+    </div>
+    <button class="btn btn-primary" id="new-deploy-btn">＋ Nouveau déploiement</button>
+  </div>
+  <div id="deployments-area"></div>
+</main>
+
+<!-- Modal de création -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-wrap">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal">
+      <h2>Nouveau déploiement</h2>
+      <p class="m-sub">Choisis ce que tu veux héberger.</p>
+
+      <div class="section-title">1 · Type</div>
+      <div class="choice-grid">
+        <div class="choice selected" data-type="site" onclick="pickType('site')">
+          <div class="c-icon">🌐</div>
+          <div class="c-title">Site web</div>
+          <div class="c-sub">Statique (HTML/CSS/JS) servi sur un sous-domaine</div>
+        </div>
+        <div class="choice" data-type="bot" onclick="pickType('bot')">
+          <div class="c-icon">🤖</div>
+          <div class="c-title">Bot Discord</div>
+          <div class="c-sub">Processus lancé en continu, avec terminal</div>
+        </div>
+      </div>
+
+      <div class="section-title" id="runtime-title" style="display:none">2 · Format du bot</div>
+      <div class="runtime-row" id="runtime-row" style="display:none">
+        <div class="runtime-chip selected" data-runtime="node" onclick="pickRuntime('node')">🟢 Node.js</div>
+        <div class="runtime-chip" data-runtime="python" onclick="pickRuntime('python')">🐍 Python</div>
+        <div class="runtime-chip" data-runtime="java" onclick="pickRuntime('java')">☕ Java</div>
+      </div>
+
+      <div class="section-title">Nom</div>
+      <input class="input" id="new-name" placeholder="mon-projet" maxlength="30" spellcheck="false">
+      <p class="faint" style="margin:8px 0 20px">3 à 30 caractères : minuscules, chiffres, tirets.</p>
+
+      <button class="btn btn-primary" id="create-btn">Créer le déploiement</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app/app.js"></script>
+<script>
+  let chosenType = 'site';
+  let chosenRuntime = 'node';
+  const SUB = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'lvh.me' : location.hostname) + (location.port ? ':' + location.port : '');
+
+  function pickType(t) {
+    chosenType = t;
+    document.querySelectorAll('.choice').forEach((c) => c.classList.toggle('selected', c.dataset.type === t));
+    document.getElementById('runtime-title').style.display = t === 'bot' ? '' : 'none';
+    document.getElementById('runtime-row').style.display = t === 'bot' ? '' : 'none';
+  }
+  function pickRuntime(r) {
+    chosenRuntime = r;
+    document.querySelectorAll('.runtime-chip').forEach((c) => c.classList.toggle('selected', c.dataset.runtime === r));
+  }
+
+  document.getElementById('new-deploy-btn').addEventListener('click', () => document.getElementById('modal').classList.add('open'));
+  document.getElementById('modal-close').addEventListener('click', () => document.getElementById('modal').classList.remove('open'));
+  document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') e.target.classList.remove('open'); });
+  document.getElementById('create-btn').addEventListener('click', async () => {
+    const name = document.getElementById('new-name').value.trim();
+    if (!name) return toast('Choisis un nom.');
+    try {
+      const { deployment } = await api('/api/deployments', {
+        method: 'POST',
+        body: JSON.stringify({ name, type: chosenType, runtime: chosenRuntime }),
+      });
+      location.href = '/panel?id=' + deployment.id;
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  });
+
+  function siteUrl(name) {
+    return location.origin + '/' + name + '/';
+  }
+
+  function render(deployments) {
+    const area = document.getElementById('deployments-area');
+    if (!deployments.length) {
+      area.innerHTML = `<div class="empty"><div class="big">🚀</div>
+        <b>Tu n'as pas encore de déploiement.</b><br>Crée un site ou un bot Discord en 30 secondes.</div>`;
+      return;
+    }
+    area.innerHTML = `<div class="deploy-grid">` + deployments.map((d) => {
+      const isBot = d.type === 'bot';
+      const statusTag = d.status === 'running'
+        ? '<span class="tag green">● EN LIGNE</span>'
+        : '<span class="tag red">● ARRÊTÉ</span>';
+      const runtimeTag = isBot ? `<span class="tag purple">${escapeHtml(d.runtime || '?')}</span>` : '<span class="tag blue">site web</span>';
+      const url = isBot ? '' : `<div class="d-url">${escapeHtml(siteUrl(d.name))}</div>`;
+      return `<div class="deploy-card">
+        <div class="d-name">${isBot ? '🤖' : '🌐'} ${escapeHtml(d.name)}</div>
+        ${url}
+        <div class="d-meta">${runtimeTag} ${statusTag} <span class="tag">modifié ${escapeHtml((d.updated_at || '').slice(0, 16).replace('T', ' '))}</span></div>
+        <div class="d-actions">
+          ${isBot ? '' : `<a class="btn btn-ghost btn-sm" href="${escapeHtml(siteUrl(d.name))}" target="_blank">Visiter ↗</a>`}
+          <a class="btn btn-primary btn-sm" href="/panel?id=${d.id}">Ouvrir le panneau</a>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  async function load() {
+    try {
+      const me = await api('/api/me');
+      if (!me.user) { location.href = '/login'; return; }
+      document.getElementById('user-email').textContent = me.user.email;
+      const { deployments } = await api('/api/deployments');
+      render(deployments);
+    } catch { location.href = '/login'; }
+  }
+  load();
+</script>
+</body>
+</html>

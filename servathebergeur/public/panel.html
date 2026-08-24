@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panneau — servathub</title>
+<link rel="stylesheet" href="/app/app.css">
+</head>
+<body>
+<!-- En-tête : statut + actions -->
+<div class="panel-head">
+  <div class="ph-left">
+    <h1 id="ph-name">…</h1>
+    <span class="status-pill stopped" id="status-pill"><span class="dot"></span><span id="status-text">STOPPED</span></span>
+    <span class="ph-meta" id="ph-meta"></span>
+  </div>
+  <div class="panel-actions">
+    <button class="btn btn-stop" id="btn-stop">■ STOP</button>
+    <button class="btn btn-restart" id="btn-restart">↻ RESTART</button>
+    <button class="btn btn-primary" id="btn-start" style="display:none">▶ START</button>
+    <button class="btn btn-ghost" id="btn-deploy">⬆ New Deploy</button>
+  </div>
+</div>
+
+<div class="panel-body">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <button class="side-item active" data-tab="overview"><span class="ic">▦</span> Overview</button>
+    <button class="side-item" data-tab="manage"><span class="ic">⚙</span> Manage</button>
+    <button class="side-item" data-tab="files"><span class="ic">📁</span> Fichiers</button>
+    <button class="side-item" data-tab="console" id="nav-console"><span class="ic">>_</span> Console</button>
+    <button class="side-item" data-tab="domain" id="nav-domain" style="display:none"><span class="ic">🔗</span> Domaine</button>
+    <button class="side-item" data-tab="settings"><span class="ic">🛠</span> Paramètres</button>
+  </nav>
+
+  <!-- Contenu -->
+  <div class="panel-content">
+
+    <!-- OVERVIEW -->
+    <div class="panel-tab active" id="tab-overview">
+      <div class="section-title">Vue d'ensemble</div>
+      <div class="kv-grid">
+        <div class="kv"><div class="k">Type</div><div class="v" id="ov-type">…</div></div>
+        <div class="kv"><div class="k">Runtime</div><div class="v dim" id="ov-runtime">—</div></div>
+        <div class="kv"><div class="k">Statut</div><div class="v" id="ov-status">…</div></div>
+        <div class="kv"><div class="k">Adresse</div><div class="v" id="ov-url">…</div></div>
+        <div class="kv"><div class="k">Créé le</div><div class="v dim" id="ov-created">…</div></div>
+        <div class="kv"><div class="k">Mis à jour</div><div class="v dim" id="ov-updated">…</div></div>
+      </div>
+      <p class="faint" id="ov-hint" style="margin-top:16px"></p>
+    </div>
+
+    <!-- MANAGE -->
+    <div class="panel-tab" id="tab-manage">
+      <div class="section-title">Gestion rapide</div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="section-title" style="margin-bottom:6px">Démarrer / arrêter</div>
+        <p class="muted" style="margin-bottom:14px">Contrôle le processus du bot à tout moment. Redémarre pour appliquer les changements de code.</p>
+        <div class="panel-actions">
+          <button class="btn btn-primary" id="m-start">▶ Démarrer</button>
+          <button class="btn btn-stop" id="m-stop">■ Arrêter</button>
+          <button class="btn btn-restart" id="m-restart">↻ Redémarrer</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:6px">Nouveau déploiement</div>
+        <p class="muted" style="margin-bottom:14px">Remplace les fichiers actuels par une nouvelle version (zip ou dossier).</p>
+        <button class="btn btn-primary" id="m-deploy">⬆ Déployer des fichiers</button>
+      </div>
+    </div>
+
+    <!-- FICHIERS -->
+    <div class="panel-tab" id="tab-files">
+      <div class="section-title">Gestionnaire de fichiers</div>
+      <div class="upload-zone">
+        <div class="dropzone" id="zip-dropzone">
+          <div class="dz-main">📦 Zip</div>
+          <div class="dz-sub">glisse / clique · remplace tout</div>
+          <input type="file" id="zip-input" accept=".zip,application/zip" hidden>
+        </div>
+        <div class="dropzone" id="folder-dropzone">
+          <div class="dz-main">📂 Dossier</div>
+          <div class="dz-sub">clique et choisis le dossier du bot/site</div>
+          <input type="file" id="folder-input" webkitdirectory hidden>
+        </div>
+      </div>
+      <div class="upload-status" id="upload-status"></div>
+
+      <div class="files-head">
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <span class="faint" id="file-count"></span>
+      </div>
+      <div class="file-list" id="file-list"></div>
+    </div>
+
+    <!-- CONSOLE -->
+    <div class="panel-tab" id="tab-console">
+      <div class="files-head">
+        <div class="section-title" style="margin-bottom:0">Console — sortie du processus</div>
+        <button class="btn btn-ghost btn-sm" id="clear-logs">🗑 Effacer</button>
+      </div>
+      <div class="terminal">
+        <div class="term-bar">
+          <span class="t-dot" style="background:#ff5f57"></span>
+          <span class="t-dot" style="background:#febc2e"></span>
+          <span class="t-dot" style="background:#28c840"></span>
+          <span class="t-title" id="term-title">bash — déconnecté</span>
+        </div>
+        <div class="term-out" id="term-out"><span class="term-empty">Démarre le bot pour voir sa sortie ici…</span></div>
+        <div class="term-in">
+          <span class="prompt">❯</span>
+          <input id="term-input" placeholder="Écris une commande / une réponse au bot, puis Entrée" autocomplete="off" disabled>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOMAINE -->
+    <div class="panel-tab" id="tab-domain">
+      <div class="section-title">Domaine personnalisé</div>
+      <div class="card">
+        <p class="muted" style="margin-bottom:16px">Branche ton propre domaine (ex : <code>mon-site.fr</code> ou <code>www.mon-site.fr</code>).</p>
+        <div class="domain-row">
+          <input class="input" id="domain-input" placeholder="mon-site.fr" spellcheck="false">
+          <button class="btn btn-primary" id="domain-btn">Ajouter</button>
+        </div>
+        <div class="domain-list" id="domain-list"></div>
+        <div class="dns-box" id="dns-box" style="display:none">
+          <div class="dns-title">1. Chez ton registrar, crée ces enregistrements :</div>
+          <table class="dns-table">
+            <tr><td>Type</td><td>Nom</td><td>Valeur</td></tr>
+            <tr><td>CNAME</td><td>@</td><td id="dns-cname">…</td></tr>
+            <tr><td>CNAME</td><td>www</td><td id="dns-cname2">…</td></tr>
+          </table>
+          <div class="dns-title" style="margin-top:14px">Le domaine doit être hébergé chez Cloudflare (ou utiliser le CNAME flattening de ton registrar) pour pointer vers cette app.</div>
+          <div class="dns-title" style="margin-top:14px">2. Attends la propagation (quelques minutes à quelques heures).</div>
+          <div class="dns-title" style="margin-top:14px">3. C'est tout ! Ton domaine pointera vers ton site. 🌍</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARAMÈTRES -->
+    <div class="panel-tab" id="tab-settings">
+      <div class="section-title">Paramètres</div>
+      <div class="card" style="margin-bottom:16px" id="settings-mainfile">
+        <div class="section-title" style="margin-bottom:6px">Fichier principal du bot</div>
+        <p class="muted" style="margin-bottom:14px">Utilisé au démarrage. Laissé vide = auto (Node : <code>index.js</code> · Python : <code>main.py</code> · Java : premier <code>.jar</code>).</p>
+        <div class="domain-row">
+          <input class="input" id="main-file-input" placeholder="ex : index.js, main.py, bot.jar">
+          <button class="btn btn-primary" id="main-file-btn">Enregistrer</button>
+        </div>
+        <p class="faint" style="margin-top:10px">Les variables d'un fichier <code>.env</code> présent dans le dossier sont chargées automatiquement au démarrage.</p>
+      </div>
+      <div class="card" style="border-color:rgba(239,68,68,.35)">
+        <div class="section-title" style="margin-bottom:6px;color:var(--danger)">Zone dangereuse</div>
+        <p class="muted" style="margin-bottom:14px">Supprime définitivement ce déploiement et tous ses fichiers.</p>
+        <button class="btn btn-danger" id="delete-btn">🗑 Supprimer ce déploiement</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/app/app.js"></script>
+<script>
+  const id = new URLSearchParams(location.search).get('id');
+  let dep = null;
+  let curDir = '';
+  let es = null;
+  const SUB = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'lvh.me' : location.hostname) + (location.port ? ':' + location.port : '');
+  const isBot = () => dep && dep.type === 'bot';
+
+  /* ---------- Navigation sidebar ---------- */
+  document.querySelectorAll('.side-item').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.side-item').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.panel-tab').forEach((t) => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------- Statut ---------- */
+  function setStatus(st) {
+    const pill = document.getElementById('status-pill');
+    pill.className = 'status-pill ' + (st === 'running' ? 'running' : 'stopped');
+    document.getElementById('status-text').textContent = st === 'running' ? 'RUNNING' : 'STOPPED';
+    document.getElementById('ov-status').textContent = st === 'running' ? 'En ligne' : 'Arrêté';
+    document.getElementById('ov-status').className = 'v ' + (st === 'running' ? 'ok' : '');
+    const running = st === 'running';
+    document.getElementById('btn-stop').disabled = !running;
+    document.getElementById('btn-restart').disabled = !running;
+    document.getElementById('btn-start').style.display = isBot() && !running ? '' : 'none';
+    document.getElementById('m-start').disabled = running;
+    document.getElementById('m-stop').disabled = !running;
+    document.getElementById('m-restart').disabled = !running;
+    document.getElementById('term-input').disabled = !running;
+    document.getElementById('term-title').textContent = running
+      ? 'processus — actif'
+      : 'processus — arrêté';
+  }
+
+  async function refreshStatus() {
+    try {
+      const { deployment } = await api('/api/deployments/' + id);
+      if (dep) dep = deployment;
+      setStatus(deployment.status);
+    } catch { /* déconnecté */ }
+  }
+
+  /* ---------- Chargement initial ---------- */
+  async function load() {
+    const { deployment } = await api('/api/deployments/' + id);
+    dep = deployment;
+    document.getElementById('ph-name').textContent = (isBot() ? '🤖' : '🌐') + ' ' + dep.name;
+    document.getElementById('ph-meta').textContent = 'créé le ' + (dep.created_at || '').slice(0, 16).replace('T', ' ');
+    document.getElementById('ov-type').textContent = isBot() ? 'Bot Discord' : 'Site web';
+    document.getElementById('ov-runtime').textContent = isBot() ? (dep.runtime || '—') : '—';
+    document.getElementById('ov-created').textContent = (dep.created_at || '').slice(0, 16).replace('T', ' ');
+    document.getElementById('ov-updated').textContent = (dep.updated_at || '').slice(0, 16).replace('T', ' ');
+    if (isBot()) {
+      document.getElementById('nav-console').style.display = '';
+      document.getElementById('ov-url').textContent = '—';
+      document.getElementById('ov-hint').textContent = 'Le bot tourne sur ce serveur. Va dans Console pour voir les logs, ou Manage pour démarrer/arrêter.';
+      document.getElementById('main-file-input').value = dep.main_file || '';
+    } else {
+      document.getElementById('nav-console').style.display = 'none';
+      document.getElementById('nav-domain').style.display = '';
+      const u = location.origin + '/' + dep.name + '/';
+      document.getElementById('ov-url').textContent = u;
+      document.getElementById('ov-url').innerHTML = `<a href="${escapeHtml(u)}" target="_blank">${escapeHtml(u)}</a>`;
+      document.getElementById('ov-hint').textContent = '🌍 Site public : dès que tu déploies des fichiers, ton site est en ligne pour tout le monde sur son adresse.';
+      document.getElementById('btn-stop').disabled = true;
+      document.getElementById('btn-restart').disabled = true;
+      document.getElementById('m-start').disabled = true;
+      document.getElementById('m-stop').disabled = true;
+      document.getElementById('m-restart').disabled = true;
+    }
+    document.getElementById('settings-mainfile').style.display = isBot() ? '' : 'none';
+    setStatus(dep.status);
+    renderDomain();
+    loadFiles();
+    if (isBot()) connectConsole();
+    setInterval(refreshStatus, 3000);
+  }
+
+  /* ---------- Boutons process ---------- */
+  async function run(action, okMsg) {
+    try {
+      const r = await api('/api/deployments/' + id + '/' + action, { method: 'POST' });
+      toast(okMsg + (r.command ? ' — ' + r.command : ''));
+      refreshStatus();
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  }
+  document.getElementById('btn-stop').addEventListener('click', () => run('stop', 'Arrêt demandé.'));
+  document.getElementById('btn-restart').addEventListener('click', () => run('restart', 'Redémarrage…'));
+  document.getElementById('btn-start').addEventListener('click', () => run('start', 'Démarrage…'));
+  document.getElementById('m-start').addEventListener('click', () => run('start', 'Démarrage…'));
+  document.getElementById('m-stop').addEventListener('click', () => run('stop', 'Arrêt demandé.'));
+  document.getElementById('m-restart').addEventListener('click', () => run('restart', 'Redémarrage…'));
+  document.getElementById('m-deploy').addEventListener('click', () => {
+    document.querySelectorAll('.side-item').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.panel-tab').forEach((t) => t.classList.remove('active'));
+    document.querySelector('[data-tab="files"]').classList.add('active');
+    document.getElementById('tab-files').classList.add('active');
+  });
+  document.getElementById('btn-deploy').addEventListener('click', () => document.getElementById('m-deploy').click());
+
+  /* ---------- Console (SSE) ---------- */
+  function connectConsole() {
+    if (es) es.close();
+    const out = document.getElementById('term-out');
+    out.innerHTML = '';
+    es = new EventSource('/api/deployments/' + id + '/logs');
+    es.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'replay') {
+        out.innerHTML = '';
+        if (!msg.lines || !msg.lines.length) out.innerHTML = '<span class="term-empty">Aucun log pour le moment. Démarre le bot !</span>';
+        msg.lines.forEach((l) => appendLine(l));
+      } else if (msg.type === 'line') {
+        if (out.querySelector('.term-empty')) out.innerHTML = '';
+        appendLine(msg.line);
+      } else if (msg.type === 'status') {
+        setStatus(msg.status);
+      }
+    };
+    es.onerror = () => { /* reconnexion automatique par EventSource */ };
+  }
+
+  function appendLine(line) {
+    const out = document.getElementById('term-out');
+    const div = document.createElement('div');
+    let cls = '';
+    if (line.startsWith('$ ')) cls = 'line-cmd';
+    else if (/^\[.*\] (Erreur|Processus terminé|Arrêt)/.test(line)) cls = 'line-dim';
+    else if (line.includes('Erreur') || line.includes('Traceback') || line.includes('Error')) cls = 'line-err';
+    div.className = cls;
+    div.textContent = line;
+    out.appendChild(div);
+    out.scrollTop = out.scrollHeight;
+    while (out.childNodes.length > 2000) out.removeChild(out.firstChild);
+  }
+
+  document.getElementById('term-input').addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter') return;
+    const input = document.getElementById('term-input');
+    const line = input.value;
+    if (!line.trim()) return;
+    input.value = '';
+    try {
+      await api('/api/deployments/' + id + '/stdin', { method: 'POST', body: JSON.stringify({ line }) });
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  });
+
+  document.getElementById('clear-logs').addEventListener('click', async () => {
+    await api('/api/deployments/' + id + '/clear-logs', { method: 'POST' });
+    document.getElementById('term-out').innerHTML = '<span class="term-empty">Logs effacés.</span>';
+  });
+
+  /* ---------- Fichiers ---------- */
+  function humanSize(n) {
+    if (n == null) return '';
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+    return (n / 1048576).toFixed(2) + ' MB';
+  }
+
+  async function loadFiles(dir) {
+    curDir = dir || '';
+    try {
+      const { listing } = await api('/api/deployments/' + id + '/files?dir=' + encodeURIComponent(curDir));
+      renderFiles(listing);
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  }
+
+  function renderFiles(listing) {
+    const crumbs = document.getElementById('breadcrumb');
+    const parts = curDir ? curDir.split('/') : [];
+    let acc = '';
+    crumbs.innerHTML = '<a onclick="loadFiles(\'\')">racine</a>' + parts.map((p, i) => {
+      acc += (i ? '/' : '') + p;
+      return ' / <a onclick="loadFiles(\'' + acc + '\')">' + escapeHtml(p) + '</a>';
+    }).join('') || '';
+    document.getElementById('file-count').textContent = listing.entries.length + ' élément(s)';
+
+    const list = document.getElementById('file-list');
+    if (!listing.entries.length) {
+      list.innerHTML = `<div class="file-row"><span class="f-name faint">Dossier vide — déploie tes fichiers ci-dessus.</span></div>`;
+      return;
+    }
+    let html = '';
+    if (curDir) {
+      const up = curDir.split('/').slice(0, -1).join('/');
+      html += `<div class="file-row" onclick="loadFiles('${up}')"><span class="f-icon">📂</span><span class="f-name">..</span></div>`;
+    }
+    for (const e of listing.entries) {
+      const full = curDir ? curDir + '/' + e.name : e.name;
+      if (e.isDir) {
+        html += `<div class="file-row" onclick="loadFiles('${full}')">
+          <span class="f-icon">📁</span><span class="f-name">${escapeHtml(e.name)}</span>
+          <span class="f-size"></span>
+          <span class="f-actions"><button class="btn btn-danger btn-sm" onclick="event.stopPropagation();delFile('${full}')">🗑</button></span>
+        </div>`;
+      } else {
+        html += `<div class="file-row">
+          <span class="f-icon">📄</span><span class="f-name">${escapeHtml(e.name)}</span>
+          <span class="f-size">${humanSize(e.size)}</span>
+          <span class="f-actions">
+            <a class="btn btn-ghost btn-sm" href="/api/deployments/${id}/file?path=${encodeURIComponent(full)}">⬇</a>
+            <button class="btn btn-danger btn-sm" onclick="delFile('${full}')">🗑</button>
+          </span>
+        </div>`;
+      }
+    }
+    list.innerHTML = html;
+  }
+
+  async function delFile(p) {
+    if (!confirm('Supprimer « ' + p + ' » ?')) return;
+    try {
+      await api('/api/deployments/' + id + '/file?path=' + encodeURIComponent(p), { method: 'DELETE' });
+      loadFiles(curDir);
+      toast('Fichier supprimé.');
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  }
+
+  /* ---------- Upload ---------- */
+  const statusEl = document.getElementById('upload-status');
+  function showStatus(msg, ok) {
+    statusEl.className = 'upload-status ' + (ok ? 'ok' : 'err');
+    statusEl.textContent = msg;
+  }
+  function bindDropzone(dz, input, handler) {
+    dz.addEventListener('click', () => input.click());
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+    dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('drag'); handler(e.dataTransfer.files[0]); });
+    input.addEventListener('change', () => handler(input.files[0] || null));
+  }
+  bindDropzone(document.getElementById('zip-dropzone'), document.getElementById('zip-input'), async (file) => {
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.zip')) return showStatus('❌ Seul un .zip est accepté ici.', false);
+    showStatus('⏳ Déploiement de ' + file.name + '…', true);
+    const fd = new FormData();
+    fd.append('zip', file);
+    try {
+      const r = await api('/api/deployments/' + id + '/upload', { method: 'POST', body: fd });
+      showStatus('✅ ' + r.message, !!r.hasIndex);
+      loadFiles(curDir);
+      refreshStatus();
+    } catch (ex) {
+      showStatus('❌ ' + ex.message, false);
+    }
+  });
+
+  document.getElementById('folder-input').addEventListener('change', async () => {
+    const input = document.getElementById('folder-input');
+    if (!input.files.length) return;
+    const fd = new FormData();
+    for (const f of input.files) {
+      fd.append('files', f);
+      fd.append('paths', f.webkitRelativePath || f.name);
+    }
+    showStatus('⏳ Import de ' + input.files.length + ' fichier(s)…', true);
+    try {
+      const r = await api('/api/deployments/' + id + '/upload-folder', { method: 'POST', body: fd });
+      showStatus('✅ ' + r.message, true);
+      loadFiles(curDir);
+      refreshStatus();
+    } catch (ex) {
+      showStatus('❌ ' + ex.message, false);
+    }
+    input.value = '';
+  });
+
+  /* ---------- Domaine ---------- */
+  function renderDomain() {
+    if (!dep) return;
+    const has = dep.custom_domain;
+    document.getElementById('domain-list').innerHTML = has
+      ? `<div class="domain-item"><code>${escapeHtml(has)}</code>
+          <button class="btn btn-danger btn-sm" onclick="removeDomain()">Retirer</button></div>`
+      : '<p class="faint">Aucun domaine personnalisé pour le moment.</p>';
+    document.getElementById('dns-box').style.display = has ? 'block' : 'none';
+    document.getElementById('dns-cname').textContent = location.hostname + (location.port ? ':' + location.port : '');
+    document.getElementById('dns-cname2').textContent = location.hostname + (location.port ? ':' + location.port : '');
+  }
+  document.getElementById('domain-btn').addEventListener('click', async () => {
+    const domain = document.getElementById('domain-input').value.trim();
+    if (!domain) return toast('Entre un domaine, ex : mon-site.fr');
+    try {
+      const r = await api('/api/deployments/' + id + '/domain', { method: 'POST', body: JSON.stringify({ domain }) });
+      dep = r.deployment;
+      document.getElementById('domain-input').value = '';
+      renderDomain();
+      toast('✅ Domaine ajouté !');
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  });
+  async function removeDomain() {
+    try {
+      await api('/api/deployments/' + id + '/domain', { method: 'DELETE' });
+      dep.custom_domain = null;
+      renderDomain();
+      toast('Domaine retiré.');
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  }
+
+  /* ---------- Paramètres ---------- */
+  document.getElementById('main-file-btn').addEventListener('click', async () => {
+    const main_file = document.getElementById('main-file-input').value.trim();
+    try {
+      const r = await api('/api/deployments/' + id, { method: 'PATCH', body: JSON.stringify({ main_file }) });
+      dep = r.deployment;
+      toast('✅ Fichier principal enregistré.');
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  });
+
+  document.getElementById('delete-btn').addEventListener('click', async () => {
+    if (!confirm('Supprimer définitivement ce déploiement et tous ses fichiers ?')) return;
+    try {
+      await api('/api/deployments/' + id, { method: 'DELETE' });
+      location.href = '/dashboard';
+    } catch (ex) {
+      toast('❌ ' + ex.message);
+    }
+  });
+
+  load().catch(() => location.href = '/dashboard');
+</script>
+</body>
+</html>
