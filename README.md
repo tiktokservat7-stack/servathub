@@ -1,10 +1,11 @@
 # servathub
 
-Assistant de codage IA gratuit basé sur l'interface de chat, avec le modèle **DeepSeek V4 Flash (Unlimited)** et sans aucune publicité.
+Assistant de codage IA gratuit basé sur l'interface de chat, avec les modèles **DeepSeek V4 Flash** et **Claude Fable 5**, sans aucune publicité.
 
 - 🚫 Aucune pub
-- 🔓 Modèle unique : DeepSeek V4 Flash — illimité
+- 🤖 2 modèles IA : DeepSeek V4 Flash (illimité) + Claude Fable 5 (premium)
 - 🔑 Chaque utilisateur se connecte avec son propre compte (gratuit)
+- 📋 Commande /model pour changer de modèle
 
 ## Installer (Windows)
 
