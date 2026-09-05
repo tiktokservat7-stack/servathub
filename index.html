@@ -356,6 +356,7 @@
     <div class="nav-right">
       <div class="nav-links">
         <a href="#install">Installer</a>
+        <a href="#modeles">Modèles</a>
         <a href="#comparatif">Comparatif</a>
         <a href="#commandes">Commandes</a>
         <a href="#faq">FAQ</a>
@@ -397,7 +398,7 @@
   </div>
 
   <div class="stats reveal">
-    <div class="stat"><div class="n">1</div><div class="l">commande à coller</div></div>
+    <div class="stat"><div class="n">2</div><div class="l">modèles IA</div></div>
     <div class="stat"><div class="n">0</div><div class="l">publicité</div></div>
     <div class="stat"><div class="n">∞</div><div class="l">usage illimité</div></div>
     <div class="stat"><div class="n">2 min</div><div class="l">pour installer</div></div>
@@ -499,7 +500,7 @@
     </div>
   </div>
 
-  <div class="note ok reveal"><b>✅ Astuce :</b> pour vérifier que tout est bien installé : <code style="font-family:var(--mono)">servathub --version</code> → doit afficher <code style="font-family:var(--mono)">1.0.0</code>.</div>
+  <div class="note ok reveal"><b>✅ Astuce :</b> pour vérifier que tout est bien installé : <code style="font-family:var(--mono)">servathub --version</code> → doit afficher <code style="font-family:var(--mono)">1.0.6</code>.</div>
 </section>
 
 <!-- ================= COMMANDES ================= -->
@@ -519,6 +520,9 @@
   <div class="code-label reveal">🚀 Lancer</div>
   <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>servathub</pre></div>
 
+  <div class="code-label reveal">🧠 Changer de modèle IA</div>
+  <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>/model</pre></div>
+
   <div class="code-label reveal">ℹ️ Vérifier la version</div>
   <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>servathub --version</pre></div>
 
@@ -527,6 +531,65 @@
 
   <div class="code-label reveal">📦 Désinstaller — méthode PowerShell</div>
   <div class="code-wrap reveal"><button class="copy" onclick="copyCmd(this)">Copier</button><pre>powershell -NoProfile -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/tiktokservat7-stack/servathub/main/uninstall.ps1 | iex"</pre></div>
+</section>
+
+<!-- ================= MODELS ================= -->
+<section id="modeles">
+  <div class="reveal">
+    <span class="section-tag">Modèles IA</span>
+    <h2>Choisis ton modèle</h2>
+    <p class="section-sub">Tape <code style="font-family:var(--mono)">/model</code> dans le chat pour voir tous les modèles disponibles et choisir celui qui te convient.</p>
+  </div>
+
+  <div class="terminal reveal d1">
+    <div class="bar">
+      <span class="circle c1"></span><span class="circle c2"></span><span class="circle c3"></span>
+      <span class="title">cmd — servathub · /model</span>
+    </div>
+    <pre><span class="prompt">C:\Users\vous&gt;</span> <span class="cmd">servathub</span>
+<span class="ok">✓ Connecté — prêt à coder.</span>
+<span class="out">▍</span> <span class="cmd">/model</span>
+
+<span class="hl">┌─────────────────────────────────────────────────┐</span>
+<span class="hl">│           🧠 MODÈLES IA DISPONIBLES             │</span>
+<span class="hl">├─────────────────────────────────────────────────┤</span>
+<span class="hl">│                                                 │</span>
+<span class="hl">│  [1] ⚡ DeepSeek V4 Flash  · Unlimited · GRATUIT│</span>
+<span class="hl">│      Le plus rapide. Idéal pour le code.        │</span>
+<span class="hl">│                                                 │</span>
+<span class="hl">│  [2] 🧠 Claude Fable 5     · Premium  · ★ NEW  │</span>
+<span class="hl">│      Le plus puissant. Analyse avancée.         │</span>
+<span class="hl">│                                                 │</span>
+<span class="hl">└─────────────────────────────────────────────────┘</span>
+
+<span class="out">▸ Entrez le numéro du modèle (1-2) :</span> <span class="cmd">1</span>
+
+<span class="ok">✓ Modèle sélectionné : DeepSeek V4 Flash</span>
+<span class="out">▍</span></pre>
+  </div>
+
+  <div class="grid reveal d2" style="margin-top:34px;">
+    <div class="card">
+      <span class="ico">⚡</span>
+      <h3>DeepSeek V4 Flash</h3>
+      <p>Le modèle par défaut. <b style="color:var(--text)">Gratuit et illimité</b>. Ultra-rapide, parfait pour le code, le debugging et les questions rapides.</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="badge" style="font-size:12px;padding:4px 10px;"><span class="ico">⚡</span>Rapide</span>
+        <span class="badge" style="font-size:12px;padding:4px 10px;"><span class="ico">🔓</span>Gratuit</span>
+        <span class="badge" style="font-size:12px;padding:4px 10px;"><span class="ico">∞</span>Illimité</span>
+      </div>
+    </div>
+    <div class="card">
+      <span class="ico">🧠</span>
+      <h3>Claude Fable 5</h3>
+      <p>Le modèle le plus puissant d'Anthropic. <b style="color:var(--text)">Analyse avancée</b>, raisonnement complexe, code production-ready.</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="badge" style="font-size:12px;padding:4px 10px;"><span class="ico">🧠</span>Puissant</span>
+        <span class="badge" style="font-size:12px;padding:4px 10px;"><span class="ico">★</span>Premium</span>
+        <span class="badge" style="font-size:12px;padding:4px 10px;"><span class="ico">🆕</span>Nouveau</span>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ================= UPDATE ================= -->
@@ -609,7 +672,11 @@
     </div>
     <div class="faq-item reveal d1">
       <button onclick="toggleFaq(this)">Quelle est la différence entre DeepSeek et Claude Fable 5 ?<span class="chev">▼</span></button>
-      <div class="answer"><p><b>DeepSeek V4 Flash</b> est le modèle par défaut — rapide, gratuit et illimité. <b>Claude Fable 5</b> est le modèle le plus puissant d'Anthropic, idéal pour les projets complexes et le code avancé. Tu peux choisir le modèle qui te convient dans le menu.</p></div>
+      <div class="answer"><p><b>DeepSeek V4 Flash</b> est le modèle par défaut — rapide, gratuit et illimité. <b>Claude Fable 5</b> est le modèle le plus puissant d'Anthropic, idéal pour les projets complexes et le code avancé. Tu peux choisir le modèle qui te convient avec la commande <code>/model</code>.</p></div>
+    </div>
+    <div class="faq-item reveal d2">
+      <button onclick="toggleFaq(this)">Comment changer de modèle ?<span class="chev">▼</span></button>
+      <div class="answer"><p>Tape <code>/model</code> dans le chat pour afficher la liste des modèles disponibles. Entre ensuite le numéro du modèle souhaité (1 pour DeepSeek, 2 pour Claude Fable 5) et appuie sur Entrée. Le changement est instantané.</p></div>
     </div>
   </div>
 </section>
