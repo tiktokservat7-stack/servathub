@@ -48,5 +48,5 @@ Ouvre ensuite un nouveau cmd pour que le PATH soit à jour.
 ## Manuel
 
 - L'installeur copie les fichiers dans `%USERPROFILE%\servathub` et ajoute ce dossier au PATH de l'utilisateur.
-- Au premier lancement, connecte-toi avec un compte gratuit sur freebuff.com (la page de connexion s'ouvre toute seule).
+- Au premier lancement, connecte-toi avec un compte gratuit (la page de connexion s'ouvre toute seule).
 - `servathub.exe` doit toujours rester à côté de `tree-sitter.wasm` (fichier requis au démarrage).
