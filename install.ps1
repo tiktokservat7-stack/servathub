@@ -3,7 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 $dest = Join-Path $env:USERPROFILE "servathub"
-$url = "https://github.com/tiktokservat7-stack/servathub/releases/download/v1.0.5"
+$url = "https://github.com/tiktokservat7-stack/servathub/releases/download/v1.8"
 
 Write-Host ""
 Write-Host "============================================"
@@ -19,7 +19,7 @@ Get-Process -Name "servathub" -ErrorAction SilentlyContinue | Stop-Process -Forc
 if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest | Out-Null }
 
 # 3. Telechargement
-Write-Host "Telechargement de servathub.exe (v1.0.5 - DeepSeek V4 Flash) ..."
+Write-Host "Telechargement de servathub.exe (v1.8 - DeepSeek V4 Flash) ..."
 Invoke-WebRequest -Uri "$url/servathub.exe" -OutFile "$dest\servathub.exe" -UseBasicParsing
 Write-Host "Telechargement de tree-sitter.wasm ..."
 Invoke-WebRequest -Uri "$url/tree-sitter.wasm" -OutFile "$dest\tree-sitter.wasm" -UseBasicParsing

@@ -1,7 +1,7 @@
 @echo off
 setlocal
 set "DEST=%USERPROFILE%\servathub"
-set "URL=https://github.com/tiktokservat7-stack/servathub/releases/download/v1.0.5"
+set "URL=https://github.com/tiktokservat7-stack/servathub/releases/download/v1.8"
 
 echo.
 echo ============================================
@@ -17,7 +17,7 @@ rem 2. Dossier de destination
 if not exist "%DEST%" mkdir "%DEST%"
 
 rem 3. Telechargement avec curl (inclus avec Windows 10/11)
-echo Telechargement de servathub.exe (v1.0.5 - DeepSeek V4 Flash) ...
+echo Telechargement de servathub.exe (v1.8 - DeepSeek V4 Flash) ...
 curl -fsSL --retry 3 -o "%DEST%\servathub.exe" "%URL%/servathub.exe"
 if errorlevel 1 goto :err
 for %%A in ("%DEST%\servathub.exe") do if %%~zA LSS 10000000 goto :err
